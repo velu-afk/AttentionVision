@@ -1,0 +1,62 @@
+# Default Full-Experiment Configuration for CIFAR-10
+# Used for controlled comparisons between BaselineCNN and AttentionCNN.
+
+experiment_name: "cifar10_controlled_comparison"
+run_type: "final_evaluation"  # Options: smoke, debug, exploratory, final_evaluation, multi_seed
+seed: 42
+deterministic: true
+device: "auto"  # "auto" selects CUDA if available, otherwise CPU
+
+data:
+  data_dir: "data"
+  dataset: "cifar10"
+  download: true
+  use_synthetic: false
+  synthetic_train_size: 512
+  synthetic_test_size: 128
+  val_fraction: 0.10          # 45,000 train / 5,000 validation from 50,000 official train set
+  split_seed: 42              # Fixed split seed so both models see identical train/val indices
+  batch_size: 128
+  eval_batch_size: 256
+  num_workers: 2
+  pin_memory: true
+  mean: [0.4914, 0.4822, 0.4465]
+  std: [0.2470, 0.2435, 0.2616]
+  random_crop_padding: 4
+  horizontal_flip_prob: 0.5
+
+model:
+  name: "baseline_cnn"        # Override via CLI: --model baseline_cnn or --model attention_cnn
+  num_classes: 10
+  in_channels: 3
+  channels: [32, 64, 128]
+  dropout_rate: 0.25
+  attention_kernel_size: 7
+  attention_residual: true    # Residual spatial gating: F' = F * (1 + M_s(F))
+  attention_stages: [2, 3]    # Apply spatial attention at Stage 2 (16x16) and Stage 3 (8x8)
+
+training:
+  epochs: 30
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  optimizer: "adamw"
+  scheduler: "cosine"         # Options: cosine, step, none
+  step_size: 10
+  gamma: 0.5
+  min_lr: 0.00001
+  grad_clip_norm: 2.0
+  early_stopping_patience: 8
+  checkpoint_dir: "checkpoints"
+  results_dir: "results"
+  save_every_epoch: false
+
+evaluation:
+  latency_batch_size: 1
+  latency_warmup_runs: 10
+  latency_measure_runs: 50
+
+robustness:
+  corruption_seed: 1337
+  gaussian_noise_sigmas: [0.0, 0.15, 0.30, 0.50, 0.75, 1.00]
+  gaussian_blur_sigmas: [0.0, 0.5, 1.0, 1.5, 2.0]
+  blur_kernel_size: 5
