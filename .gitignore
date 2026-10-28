@@ -1,0 +1,46 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing and linting caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Datasets and downloaded archives
+data/
+datasets/
+*.tar.gz
+*.zip
+
+# Model checkpoints (exclude binary weights by default, keep .gitkeep)
+checkpoints/*
+!checkpoints/.gitkeep
+
+# Generated experiment artifacts (keep .gitkeep and documented sample summaries if explicitly tracked)
+results/*
+!results/.gitkeep
+!results/smoke_summary.csv
+!results/smoke_comparison.json
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

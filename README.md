@@ -1,0 +1,280 @@
+# AttentionVision: Investigating Spatial Attention in CNN-Based Image Classification
+
+**AttentionVision** is a controlled, reproducible PyTorch research repository designed to empirically investigate whether adding a lightweight channel-pooled spatial-attention mechanism to a compact convolutional neural network (CNN) improves image-classification accuracy, alters sensitivity to synthetic image corruptions, or introduces computational overhead on $32 \times 32$ RGB images.
+
+---
+
+## 1. Research Motivation
+
+Spatial attention mechanisms (such as the spatial branch of CBAM, Woo et al., ECCV 2018) are widely used to reweight intermediate convolutional feature maps before spatial pooling. However, on low-resolution benchmarks like CIFAR-10 ($32 \times 32$ pixels), intermediate feature maps quickly shrink to $16 \times 16$ and $8 \times 8$. Rather than assuming attention automatically improves performance, this project treats spatial attention as a **controlled empirical hypothesis** and evaluates accuracy, per-class precision/recall/F1, corruption sensitivity, parameter overhead, and single-sample inference latency under identical experimental conditions.
+
+---
+
+## 2. Research Question and Hypotheses
+
+### Research Question
+Does adding a lightweight spatial-attention mechanism to a convolutional neural network improve image-classification performance, corruption sensitivity, or computational efficiency compared with a comparable CNN baseline?
+
+### Testable Hypotheses
+- **H1 (Classification Performance)**: Spatial attention may improve classification accuracy or accelerate convergence by allowing the network to emphasize informative spatial regions prior to pooling.
+- **H2 (Corruption Sensitivity)**: Spatial attention may either improve or worsen classification accuracy under controlled pixel perturbations (Gaussian noise and Gaussian blur). This must be established experimentally across severity levels.
+- **H3 (Efficiency & Variability Trade-off)**: Any performance difference must be evaluated alongside parameter count ($+196$ parameters), training time, inference latency, and cross-seed experimental variability.
+
+---
+
+## 3. What Is Implemented
+
+- **Model A (`BaselineCNN`)**: A compact 3-stage CNN ($3 \to 32 \to 64 \to 128$ channels, $94,762$ trainable parameters) with `Conv2d`, `BatchNorm2d`, `ReLU`, `MaxPool2d`, `AdaptiveAvgPool2d((1, 1))`, `Dropout`, and a 10-logit linear head (`src/attentionvision/models/cnn.py`).
+- **Model B (`AttentionCNN`)**: The exact same 3-stage CNN backbone augmented with reusable `SpatialAttention` modules ($7 \times 7$ spatial kernel, residual multiplicative gating $F \odot (1 + M_s(F))$) at Stage 2 ($16 \times 16$) and Stage 3 ($8 \times 8$), adding only **$196$ parameters** ($94,958$ total, $+0.21\%$) (`src/attentionvision/models/attention.py`).
+- **Leakage-Free Data Pipeline**: Deterministic train/validation partitioning ($45,000$ train / $5,000$ validation / $10,000$ official test) with strict transform isolation so training augmentations never affect validation or test images, plus an offline procedural dataset (`SyntheticCIFAR10Dataset`) for zero-download unit and smoke testing (`src/attentionvision/data.py`).
+- **Training & Checkpointing Pipeline**: Readable training and validation loops with `AdamW`, `CosineAnnealingLR` / `StepLR`, gradient norm clipping, early stopping, and full stateful checkpoint save/load/resume support (`src/attentionvision/train.py`).
+- **Evaluation, Latency Benchmarking & Visualization**: Automated computation of accuracy, macro precision/recall/F1, per-class metrics, $10 \times 10$ confusion matrices, warm-up-controlled inference latency, and publication-clean plots (`src/attentionvision/evaluate.py`, `src/attentionvision/metrics.py`).
+- **Controlled Corruption Sensitivity Suite**: Evaluation-time Gaussian noise and Gaussian blur sweeps across configurable severities $\sigma$ using identical seeded perturbations across both models (`src/attentionvision/robustness.py`).
+- **Automated Tests & CI**: 28 offline CPU unit tests (`tests/`) and GitHub Actions CI (`.github/workflows/tests.yml`).
+
+---
+
+## 4. Model Architecture Overview
+
+```mermaid
+graph LR
+    A["Input Batch<br/>(B, 3, 32, 32)"] --> B["Stage 1: ConvBlock<br/>3 -> 32, 3x3 + BN + ReLU<br/>(B, 32, 32, 32)"]
+    B --> C["MaxPool2d 2x2<br/>(B, 32, 16, 16)"]
+    C --> D["Stage 2: ConvBlock<br/>32 -> 64, 3x3 + BN + ReLU<br/>(B, 64, 16, 16)"]
+    D --> E["[AttentionCNN Only]<br/>SpatialAttention k=7<br/>Map: (B, 1, 16, 16)"]
+    E --> F["MaxPool2d 2x2<br/>(B, 64, 8, 8)"]
+    F --> G["Stage 3: ConvBlock<br/>64 -> 128, 3x3 + BN + ReLU<br/>(B, 128, 8, 8)"]
+    G --> H["[AttentionCNN Only]<br/>SpatialAttention k=7<br/>Map: (B, 1, 8, 8)"]
+    H --> I["MaxPool2d 2x2<br/>(B, 128, 4, 4)"]
+    I --> J["AdaptiveAvgPool2d 1x1<br/>+ Flatten + Dropout(0.25)<br/>(B, 128)"]
+    J --> K["Linear Classifier<br/>128 -> 10 Logits<br/>(B, 10)"]
+```
+
+### Spatial Attention Formulation (`SpatialAttention`)
+Given an intermediate feature map $F \in \mathbb{R}^{B \times C \times H \times W}$:
+1. Compute channel-wise average and maximum projections:
+   $$F_{\text{avg}} = \frac{1}{C}\sum_{c=1}^{C} F_{:,c,:,:} \in \mathbb{R}^{B \times 1 \times H \times W}, \quad F_{\text{max}} = \max_{c} F_{:,c,:,:} \in \mathbb{R}^{B \times 1 \times H \times W}$$
+2. Concatenate along the channel dimension and apply a $7 \times 7$ convolution (padding $3$) followed by a logistic sigmoid:
+   $$M_s(F) = \sigma\left(\text{Conv2d}_{2 \to 1, 7 \times 7}([F_{\text{avg}}; F_{\text{max}}])\right) \in (0, 1)^{B \times 1 \times H \times W}$$
+3. Modulate features via broadcasted residual multiplication:
+   $$F_{\text{out}} = F \odot \left(1 + M_s(F)\right) \in \mathbb{R}^{B \times C \times H \times W}$$
+
+---
+
+## 5. Dataset Description and Attribution
+
+- **Dataset**: [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) by Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton (2009), *Learning Multiple Layers of Features from Tiny Images*, University of Toronto.
+- **Structure**: $60,000$ $32 \times 32$ RGB images across $10$ classes ($50,000$ official train, $10,000$ official test).
+- **Split Protocol**: Deterministic split (`split_seed: 42`) divides the $50,000$ official training set into **$45,000$ training** and **$5,000$ validation** images. The **$10,000$ official test set** is held out strictly for final evaluation.
+
+---
+
+## 6. Installation Instructions (CPU and CUDA)
+
+```bash
+# 1. Clone or navigate into the repository
+cd AttentionVision
+
+# 2. Create and activate a virtual environment (Python 3.10 or 3.11)
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3a. On a machine with an NVIDIA GPU (e.g., Lenovo LOQ with RTX 4050):
+pip install --upgrade pip
+pip install torch torchvision
+pip install -e ".[dev]"
+
+# 3b. On a CPU-only machine:
+pip install --upgrade pip
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -e ".[dev]"
+
+# 4. Verify hardware, Python, and CUDA detection
+python -m attentionvision inspect-env
+```
+
+When `device: "auto"` is set in `configs/default.yaml`, `attentionvision` automatically uses CUDA if `torch.cuda.is_available()` is `True`, and falls back to CPU otherwise. You can force CPU execution at any time via `--device cpu`.
+
+---
+
+## 7. Command-Line Interface & Workflow Commands
+
+All commands use the consistent `python -m attentionvision <subcommand>` interface:
+
+```bash
+# 1. Inspect environment (Python, PyTorch, CPU/RAM, CUDA status)
+python -m attentionvision inspect-env
+
+# 2. Prepare and verify dataset splits + save sample image grid
+python -m attentionvision prepare-data --config configs/default.yaml
+
+# 3. Run rapid offline CPU smoke test (trains & evaluates both models on synthetic 32x32 data)
+bash scripts/run_smoke_test.sh
+# Or directly via CLI:
+python -m attentionvision smoke-test --config configs/smoke.yaml
+
+# 4. Train BaselineCNN and AttentionCNN on CIFAR-10
+python -m attentionvision train --config configs/default.yaml --model baseline_cnn --seed 42
+python -m attentionvision train --config configs/default.yaml --model attention_cnn --seed 42
+
+# 5. Resume training from a saved checkpoint
+python -m attentionvision train --config configs/default.yaml --model attention_cnn --seed 42 \
+    --resume checkpoints/attention_cnn_seed42/last_model.pt --epochs 40
+
+# 6. Evaluate trained checkpoints on the held-out test set & generate plots
+python -m attentionvision evaluate --config configs/default.yaml \
+    --checkpoint checkpoints/baseline_cnn_seed42/best_model.pt
+python -m attentionvision evaluate --config configs/default.yaml \
+    --checkpoint checkpoints/attention_cnn_seed42/best_model.pt
+
+# 7. Run controlled Gaussian noise & Gaussian blur corruption sensitivity experiment
+python -m attentionvision robustness --config configs/default.yaml \
+    --baseline-checkpoint checkpoints/baseline_cnn_seed42/best_model.pt \
+    --attention-checkpoint checkpoints/attention_cnn_seed42/best_model.pt
+
+# 8. Compare completed runs and generate Markdown/CSV/JSON summary tables
+python scripts/compare_results.py --results-dir results
+
+# 9. Run full 3-seed CIFAR-10 experiment suite (Seeds 42, 43, 44)
+bash scripts/run_experiments.sh
+
+# 10. Run unit tests and Ruff linter checks
+pytest tests -v
+ruff check src tests scripts
+ruff format --check src tests scripts
+```
+
+---
+
+## 8. Experimental Results
+
+### 8.1 Completed 3-Seed CPU Smoke Verification (`configs/smoke.yaml`, Synthetic 32x32 Dataset)
+Executed in the offline build environment (`Linux-6.12.105+-x86_64`, 2 CPU cores, 7.76 GiB RAM, CPU-only, seeds `42, 43, 44`, 5 epochs per run; full outputs in `results/smoke/`):
+
+| Model | Seeds | Dataset | Params | Val Acc (%) | Test Acc (%) | Seed 42 Val Loss | Train Time (s) | CPU Latency (ms/img) |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `baseline_cnn` | `42, 43, 44` | `SyntheticCIFAR10` (Smoke) | $94,762$ | $100.00 \pm 0.00$ | $100.00 \pm 0.00$ | $0.3736$ | $16.77 \pm 0.28$ | $5.558$ |
+| `attention_cnn` | `42, 43, 44` | `SyntheticCIFAR10` (Smoke) | $94,958$ | $100.00 \pm 0.00$ | $100.00 \pm 0.00$ | $0.1501$ | $18.32 \pm 0.54$ | $5.821$ |
+
+### 8.2 Completed Smoke Corruption Sensitivity Sweep (`results/smoke/robustness/robustness_results.csv`, Seed 42)
+
+| Corruption Type | Severity ($\sigma$) | `BaselineCNN` Test Acc (%) | `AttentionCNN` Test Acc (%) | `BaselineCNN` Macro-F1 (%) | `AttentionCNN` Macro-F1 (%) |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Clean (`sigma=0.0`) | $0.00$ | $100.00$ | $100.00$ | $100.00$ | $100.00$ |
+| Gaussian Noise | $0.25$ | $100.00$ | $100.00$ | $100.00$ | $100.00$ |
+| Gaussian Noise | $0.50$ | $50.00$ | $50.00$ | $38.94$ | $40.00$ |
+| Gaussian Noise | $0.75$ | $30.00$ | $28.33$ | $17.86$ | $21.27$ |
+| Gaussian Noise | $1.00$ | $20.00$ | $16.67$ | $8.07$ | $11.94$ |
+| Gaussian Blur | $0.50$ | $68.33$ | $83.33$ | $62.07$ | $80.07$ |
+| Gaussian Blur | $1.00$ | $45.00$ | $20.00$ | $36.14$ | $12.00$ |
+| Gaussian Blur | $1.50$ | $38.33$ | $20.00$ | $30.64$ | $12.00$ |
+
+> **Important Note on Smoke vs. Official CIFAR-10 Benchmarks**: The tables above are genuine outputs from the offline CPU smoke verification pipeline (`SyntheticCIFAR10Dataset`). Because the build sandbox has no outbound network access to download the 170 MB CIFAR-10 archive from `cs.toronto.edu`, official 50,000-image CIFAR-10 benchmark numbers are marked as **Pending** below until `bash scripts/run_experiments.sh` is executed on a networked machine (e.g., your Lenovo LOQ RTX 4050).
+
+### 8.3 Official CIFAR-10 Multi-Seed Benchmark Table (`configs/default.yaml`)
+
+| Model | Seeds | Dataset | Params | Best Val Acc (%) | Test Acc (%) | Macro-F1 (%) | Train Time (s) | Latency (ms/img) |
+| :--- | :--- | :--- | ---: | :--- | :--- | :--- | :--- | :--- |
+| `baseline_cnn` | `42, 43, 44` | Official CIFAR-10 | $94,762$ | *Pending (`run_experiments.sh`)* | *Pending* | *Pending* | *Pending* | *Pending* |
+| `attention_cnn` | `42, 43, 44` | Official CIFAR-10 | $94,958$ | *Pending (`run_experiments.sh`)* | *Pending* | *Pending* | *Pending* | *Pending* |
+
+---
+
+## 9. Repository Structure
+
+```text
+AttentionVision/
+├── README.md
+├── LICENSE
+├── CITATION.cff
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── .gitignore
+├── .editorconfig
+├── .pre-commit-config.yaml
+├── pyproject.toml
+├── requirements.txt
+├── Makefile
+├── configs/
+│   ├── default.yaml
+│   └── smoke.yaml
+├── src/
+│   └── attentionvision/
+│       ├── __init__.py
+│       ├── __main__.py
+│       ├── cli.py
+│       ├── config.py
+│       ├── data.py
+│       ├── train.py
+│       ├── evaluate.py
+│       ├── metrics.py
+│       ├── robustness.py
+│       ├── experiment.py
+│       ├── utils.py
+│       └── models/
+│           ├── __init__.py
+│           ├── cnn.py
+│           └── attention.py
+├── scripts/
+│   ├── run_smoke_test.sh
+│   ├── run_experiments.sh
+│   └── compare_results.py
+├── tests/
+│   ├── test_models.py
+│   ├── test_attention.py
+│   ├── test_data.py
+│   ├── test_metrics.py
+│   ├── test_checkpoint.py
+│   └── test_training.py
+├── notebooks/
+│   └── exploratory_analysis.ipynb
+├── docs/
+│   ├── methodology.md
+│   ├── architecture.md
+│   ├── experiments.md
+│   ├── limitations.md
+│   ├── interview_guide.md
+│   ├── interview_defense.md
+│   └── learning_plan.md
+├── results/
+│   └── .gitkeep
+├── checkpoints/
+│   └── .gitkeep
+└── .github/
+    └── workflows/
+        └── tests.yml
+```
+
+---
+
+## 10. Limitations and Future Work
+
+### Key Limitations (Detailed in [`docs/limitations.md`](docs/limitations.md))
+1. **Low Spatial Resolution ($32 \times 32$)**: Feature maps shrink to $16 \times 16$ and $8 \times 8$ quickly, limiting the spatial granularity available for attention gating compared with $224 \times 224$ images.
+2. **Non-Causal Attention Maps**: Spatial attention heatmaps $M_s(F)$ visualize intermediate activation reweighting, not causal explanations of model predictions.
+3. **Synthetic Corruptions**: Gaussian noise and Gaussian blur test two parametric pixel perturbations and do not establish general real-world out-of-distribution robustness.
+4. **Single-Backbone Scope**: Results apply to a compact 3-stage CNN (~$95\text{k}$ parameters) and may differ in deeper residual networks (e.g., ResNet-18/50).
+
+### Future Work
+- Ablate attention placement across stages (`[1]`, `[2]`, `[3]`, `[1, 2, 3]`) and kernel sizes ($k \in \{3, 5, 7\}$).
+- Compare channel attention (Squeeze-and-Excitation) vs. spatial attention vs. joint CBAM in a $2 \times 2$ factorial experiment.
+- Evaluate on higher-resolution datasets (e.g., STL-10 at $96 \times 96$ or Tiny-ImageNet at $64 \times 64$) and CIFAR-10-C (Hendrycks & Dietterich, 2019).
+
+---
+
+## 11. Documentation & Interview Preparation Guides
+
+- **[`docs/methodology.md`](docs/methodology.md)**: Controlled experimental design, split hygiene, metrics, and corruption protocol.
+- **[`docs/architecture.md`](docs/architecture.md)**: Stage-by-stage tensor dimensions, parameter counts, and spatial attention math.
+- **[`docs/experiments.md`](docs/experiments.md)**: Run classifications, smoke outputs, CIFAR-10 templates, and negative-result interpretation.
+- **[`docs/limitations.md`](docs/limitations.md)**: Methodological, dataset, and interpretability constraints.
+- **[`docs/interview_guide.md`](docs/interview_guide.md)**: Beginner-friendly tutorial on all 22+ ML/DL concepts used in this repo.
+- **[`docs/interview_defense.md`](docs/interview_defense.md)**: 30-second pitch, 2-minute walkthrough, 28 project Q&As, and 12 follow-up defenses.
+- **[`docs/learning_plan.md`](docs/learning_plan.md)**: Prioritized 2-day study plan for interview readiness.
+
+---
+
+## 12. Citation and Licensing
+
+- **Repository License**: Released under the [MIT License](LICENSE).
+- **Dataset Terms**: CIFAR-10 is provided by Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton (University of Toronto). See [`CITATION.cff`](CITATION.cff) for BibTeX/CFF citation details.

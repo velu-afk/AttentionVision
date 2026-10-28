@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+title: "AttentionVision: Investigating Spatial Attention in CNN-Based Image Classification"
+message: "If you use or reference this experimental repository, please cite it using the metadata below and also cite the original CIFAR-10 dataset report by Krizhevsky (2009)."
+type: software
+authors:
+  - name: "AttentionVision Research Contributors"
+version: 0.1.0
+date-released: "2026-10-28"
+license: MIT
+keywords:
+  - computer-vision
+  - spatial-attention
+  - convolutional-neural-networks
+  - cifar-10
+  - reproducibility
+  - robustness
+references:
+  - type: report
+    title: "Learning Multiple Layers of Features from Tiny Images"
+    authors:
+      - family-names: Krizhevsky
+        given-names: Alex
+    year: 2009
+    institution:
+      name: "University of Toronto"
+  - type: conference-paper
+    title: "CBAM: Convolutional Block Attention Module"
+    authors:
+      - family-names: Woo
+        given-names: Sanghyun
+      - family-names: Park
+        given-names: Jongchan
+      - family-names: Lee
+        given-names: Joon-Young
+      - family-names: Kweon
+        given-names: In So
+    collection-title: "Proceedings of the European Conference on Computer Vision (ECCV)"
+    year: 2018
