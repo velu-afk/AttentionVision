@@ -1,0 +1,37 @@
+{
+  "run_id": "attention_cnn_seed44",
+  "experiment_name": "smoke_test_comparison",
+  "run_type": "smoke",
+  "model_name": "attention_cnn",
+  "seed": 44,
+  "device": "cpu",
+  "is_synthetic_data": true,
+  "parameter_count": 94958,
+  "epochs_completed": 5,
+  "best_epoch": 5,
+  "best_val_acc": 1.0,
+  "best_val_loss": 0.127636,
+  "total_training_time_sec": 18.003,
+  "best_checkpoint": "checkpoints/smoke/attention_cnn_seed44/best_model.pt",
+  "last_checkpoint": "checkpoints/smoke/attention_cnn_seed44/last_model.pt",
+  "results_dir": "results/smoke/attention_cnn_seed44",
+  "environment": {
+    "python_version": "3.11.2",
+    "platform": "Linux-6.12.105+-x86_64-with-glibc2.36",
+    "cpu_count": 2,
+    "ram_gb": 7.76,
+    "cuda_available": false,
+    "cuda_device_count": 0,
+    "cuda_device_name": null,
+    "packages": {
+      "torch": "2.4.1+cpu.sandbox",
+      "torchvision": "0.19.1+cpu.sandbox",
+      "numpy": "1.24.2",
+      "scipy": "1.15.2",
+      "pandas": "2.2.3",
+      "matplotlib": "3.10.1",
+      "scikit_learn": "1.5.2-sandbox",
+      "pyyaml": "6.0"
+    }
+  }
+}

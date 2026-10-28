@@ -1,0 +1,7 @@
+2026-10-28 12:19:07 | INFO     | Starting run 'attention_cnn_seed42' | run_type=smoke | device=cpu | seed=42
+2026-10-28 12:19:07 | INFO     | Model=attention_cnn | parameters=94,958 | train=192 | val=48 | synthetic=True
+2026-10-28 12:19:11 | INFO     | Epoch 01/05 | train_loss=1.6004 train_acc=0.5000 | val_loss=1.4319 val_acc=0.5833 | time=3.67s
+2026-10-28 12:19:15 | INFO     | Epoch 02/05 | train_loss=0.6780 train_acc=0.8021 | val_loss=0.8389 val_acc=0.6667 | time=3.55s
+2026-10-28 12:19:18 | INFO     | Epoch 03/05 | train_loss=0.2571 train_acc=0.9896 | val_loss=0.3634 val_acc=0.9792 | time=3.49s
+2026-10-28 12:19:22 | INFO     | Epoch 04/05 | train_loss=0.1493 train_acc=0.9948 | val_loss=0.2115 val_acc=1.0000 | time=3.44s
+2026-10-28 12:19:25 | INFO     | Epoch 05/05 | train_loss=0.1156 train_acc=1.0000 | val_loss=0.1501 val_acc=1.0000 | time=3.53s

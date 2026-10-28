@@ -1,0 +1,73 @@
+experiment_name: smoke_test_comparison
+run_type: smoke
+seed: 42
+deterministic: true
+device: cpu
+data:
+  data_dir: data
+  dataset: cifar10
+  download: false
+  use_synthetic: true
+  synthetic_train_size: 240
+  synthetic_test_size: 60
+  val_fraction: 0.2
+  split_seed: 42
+  batch_size: 32
+  eval_batch_size: 32
+  num_workers: 0
+  pin_memory: false
+  mean:
+  - 0.4914
+  - 0.4822
+  - 0.4465
+  std:
+  - 0.247
+  - 0.2435
+  - 0.2616
+  random_crop_padding: 2
+  horizontal_flip_prob: 0.5
+model:
+  name: baseline_cnn
+  num_classes: 10
+  in_channels: 3
+  channels:
+  - 32
+  - 64
+  - 128
+  dropout_rate: 0.15
+  attention_kernel_size: 7
+  attention_residual: true
+  attention_stages:
+  - 2
+  - 3
+training:
+  epochs: 5
+  learning_rate: 0.003
+  weight_decay: 0.0005
+  optimizer: adamw
+  scheduler: cosine
+  step_size: 2
+  gamma: 0.5
+  min_lr: 0.0001
+  grad_clip_norm: 2.0
+  early_stopping_patience: 5
+  checkpoint_dir: checkpoints/smoke
+  results_dir: results/smoke
+  save_every_epoch: false
+evaluation:
+  latency_batch_size: 1
+  latency_warmup_runs: 3
+  latency_measure_runs: 10
+robustness:
+  corruption_seed: 1337
+  gaussian_noise_sigmas:
+  - 0.0
+  - 0.05
+  - 0.1
+  - 0.2
+  gaussian_blur_sigmas:
+  - 0.0
+  - 0.5
+  - 1.0
+  - 1.5
+  blur_kernel_size: 5

@@ -1,0 +1,223 @@
+{
+  "experiment_name": "smoke_test_comparison",
+  "run_type": "smoke",
+  "is_synthetic_data": true,
+  "corruption_seed": 1337,
+  "blur_kernel_size": 5,
+  "gaussian_noise_sigmas": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "gaussian_blur_sigmas": [
+    0.0,
+    0.5,
+    1.0,
+    1.5
+  ],
+  "csv_path": "results/smoke/robustness/robustness_results.csv",
+  "noise_plot": "results/smoke/robustness/robustness_gaussian_noise.png",
+  "blur_plot": "results/smoke/robustness/robustness_gaussian_blur.png",
+  "records": [
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 0.0,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 0.25,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 0.5,
+      "accuracy": 0.5,
+      "macro_precision": 0.357666,
+      "macro_recall": 0.5,
+      "macro_f1": 0.389379,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 0.75,
+      "accuracy": 0.3,
+      "macro_precision": 0.15,
+      "macro_recall": 0.3,
+      "macro_f1": 0.178571,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 1.0,
+      "accuracy": 0.2,
+      "macro_precision": 0.053333,
+      "macro_recall": 0.2,
+      "macro_f1": 0.080672,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_blur",
+      "sigma": 0.0,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_blur",
+      "sigma": 0.5,
+      "accuracy": 0.683333,
+      "macro_precision": 0.596154,
+      "macro_recall": 0.683333,
+      "macro_f1": 0.620734,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_blur",
+      "sigma": 1.0,
+      "accuracy": 0.45,
+      "macro_precision": 0.364904,
+      "macro_recall": 0.45,
+      "macro_f1": 0.361404,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_blur",
+      "sigma": 1.5,
+      "accuracy": 0.383333,
+      "macro_precision": 0.370335,
+      "macro_recall": 0.383333,
+      "macro_f1": 0.306432,
+      "num_samples": 60,
+      "model_name": "baseline_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 0.0,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 0.25,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 0.5,
+      "accuracy": 0.5,
+      "macro_precision": 0.37,
+      "macro_recall": 0.5,
+      "macro_f1": 0.4,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 0.75,
+      "accuracy": 0.283333,
+      "macro_precision": 0.212245,
+      "macro_recall": 0.283333,
+      "macro_f1": 0.212727,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_noise",
+      "sigma": 1.0,
+      "accuracy": 0.166667,
+      "macro_precision": 0.210714,
+      "macro_recall": 0.166667,
+      "macro_f1": 0.119355,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_blur",
+      "sigma": 0.0,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_blur",
+      "sigma": 0.5,
+      "accuracy": 0.833333,
+      "macro_precision": 0.795714,
+      "macro_recall": 0.833333,
+      "macro_f1": 0.800717,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_blur",
+      "sigma": 1.0,
+      "accuracy": 0.2,
+      "macro_precision": 0.111111,
+      "macro_recall": 0.2,
+      "macro_f1": 0.12,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    },
+    {
+      "corruption_type": "gaussian_blur",
+      "sigma": 1.5,
+      "accuracy": 0.2,
+      "macro_precision": 0.111111,
+      "macro_recall": 0.2,
+      "macro_f1": 0.12,
+      "num_samples": 60,
+      "model_name": "attention_cnn",
+      "seed": 42
+    }
+  ]
+}

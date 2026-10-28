@@ -1,0 +1,11 @@
+class_id,class_name,precision,recall,f1,support
+0,airplane,1.0,1.0,1.0,6
+1,automobile,1.0,1.0,1.0,6
+2,bird,1.0,1.0,1.0,6
+3,cat,1.0,1.0,1.0,6
+4,deer,1.0,1.0,1.0,6
+5,dog,1.0,1.0,1.0,6
+6,frog,1.0,1.0,1.0,6
+7,horse,1.0,1.0,1.0,6
+8,ship,1.0,1.0,1.0,6
+9,truck,1.0,1.0,1.0,6

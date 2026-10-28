@@ -1,0 +1,7 @@
+2026-10-28 12:16:50 | INFO     | Starting run 'baseline_cnn_seed44' | run_type=smoke | device=cpu | seed=44
+2026-10-28 12:16:50 | INFO     | Model=baseline_cnn | parameters=94,762 | train=192 | val=48 | synthetic=True
+2026-10-28 12:16:53 | INFO     | Epoch 01/05 | train_loss=1.6695 train_acc=0.4740 | val_loss=1.7532 val_acc=0.6042 | time=2.96s
+2026-10-28 12:16:56 | INFO     | Epoch 02/05 | train_loss=0.8374 train_acc=0.8802 | val_loss=1.0590 val_acc=0.8125 | time=3.30s
+2026-10-28 12:17:00 | INFO     | Epoch 03/05 | train_loss=0.5094 train_acc=0.9688 | val_loss=0.6580 val_acc=1.0000 | time=3.28s
+2026-10-28 12:17:03 | INFO     | Epoch 04/05 | train_loss=0.3627 train_acc=0.9896 | val_loss=0.4447 val_acc=1.0000 | time=3.33s
+2026-10-28 12:17:06 | INFO     | Epoch 05/05 | train_loss=0.3023 train_acc=1.0000 | val_loss=0.3528 val_acc=1.0000 | time=3.33s

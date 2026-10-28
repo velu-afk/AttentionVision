@@ -1,0 +1,12 @@
+2026-10-28 12:16:15 | INFO     | Starting run 'baseline_cnn_seed43' | run_type=smoke | device=cpu | seed=43
+2026-10-28 12:16:15 | INFO     | Model=baseline_cnn | parameters=94,762 | train=192 | val=48 | synthetic=True
+2026-10-28 12:16:19 | INFO     | Epoch 01/03 | train_loss=1.7763 train_acc=0.4427 | val_loss=1.9374 val_acc=0.7292 | time=3.86s
+2026-10-28 12:16:23 | INFO     | Epoch 02/03 | train_loss=0.9912 train_acc=0.8229 | val_loss=1.4014 val_acc=0.6667 | time=3.58s
+2026-10-28 12:16:26 | INFO     | Epoch 03/03 | train_loss=0.7746 train_acc=0.9271 | val_loss=1.0941 val_acc=0.7708 | time=3.43s
+2026-10-28 12:17:39 | INFO     | Starting run 'baseline_cnn_seed43' | run_type=smoke | device=cpu | seed=43
+2026-10-28 12:17:39 | INFO     | Model=baseline_cnn | parameters=94,762 | train=192 | val=48 | synthetic=True
+2026-10-28 12:17:43 | INFO     | Epoch 01/05 | train_loss=1.6210 train_acc=0.5052 | val_loss=1.7259 val_acc=0.6667 | time=3.22s
+2026-10-28 12:17:46 | INFO     | Epoch 02/05 | train_loss=0.7652 train_acc=0.8958 | val_loss=1.0618 val_acc=0.7917 | time=3.15s
+2026-10-28 12:17:49 | INFO     | Epoch 03/05 | train_loss=0.5119 train_acc=0.9896 | val_loss=0.6214 val_acc=0.9792 | time=3.45s
+2026-10-28 12:17:53 | INFO     | Epoch 04/05 | train_loss=0.3392 train_acc=1.0000 | val_loss=0.4710 val_acc=0.9583 | time=3.47s
+2026-10-28 12:17:56 | INFO     | Epoch 05/05 | train_loss=0.2805 train_acc=1.0000 | val_loss=0.3728 val_acc=1.0000 | time=3.35s

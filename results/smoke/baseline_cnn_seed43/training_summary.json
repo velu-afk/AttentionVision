@@ -1,0 +1,37 @@
+{
+  "run_id": "baseline_cnn_seed43",
+  "experiment_name": "smoke_test_comparison",
+  "run_type": "smoke",
+  "model_name": "baseline_cnn",
+  "seed": 43,
+  "device": "cpu",
+  "is_synthetic_data": true,
+  "parameter_count": 94762,
+  "epochs_completed": 5,
+  "best_epoch": 5,
+  "best_val_acc": 1.0,
+  "best_val_loss": 0.372793,
+  "total_training_time_sec": 16.823,
+  "best_checkpoint": "checkpoints/smoke/baseline_cnn_seed43/best_model.pt",
+  "last_checkpoint": "checkpoints/smoke/baseline_cnn_seed43/last_model.pt",
+  "results_dir": "results/smoke/baseline_cnn_seed43",
+  "environment": {
+    "python_version": "3.11.2",
+    "platform": "Linux-6.12.105+-x86_64-with-glibc2.36",
+    "cpu_count": 2,
+    "ram_gb": 7.76,
+    "cuda_available": false,
+    "cuda_device_count": 0,
+    "cuda_device_name": null,
+    "packages": {
+      "torch": "2.4.1+cpu.sandbox",
+      "torchvision": "0.19.1+cpu.sandbox",
+      "numpy": "1.24.2",
+      "scipy": "1.15.2",
+      "pandas": "2.2.3",
+      "matplotlib": "3.10.1",
+      "scikit_learn": "1.5.2-sandbox",
+      "pyyaml": "6.0"
+    }
+  }
+}
