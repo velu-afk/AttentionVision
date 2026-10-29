@@ -233,8 +233,6 @@ AttentionVision/
 │   ├── architecture.md
 │   ├── experiments.md
 │   ├── limitations.md
-│   ├── interview_guide.md
-│   ├── interview_defense.md
 │   └── learning_plan.md
 ├── results/
 │   └── .gitkeep
@@ -262,15 +260,12 @@ AttentionVision/
 
 ---
 
-## 11. Documentation & Interview Preparation Guides
+## 11. Documentation
 
-- **[`docs/methodology.md`](docs/methodology.md)**: Controlled experimental design, split hygiene, metrics, and corruption protocol.
-- **[`docs/architecture.md`](docs/architecture.md)**: Stage-by-stage tensor dimensions, parameter counts, and spatial attention math.
-- **[`docs/experiments.md`](docs/experiments.md)**: Run classifications, smoke outputs, CIFAR-10 templates, and negative-result interpretation.
-- **[`docs/limitations.md`](docs/limitations.md)**: Methodological, dataset, and interpretability constraints.
-- **[`docs/interview_guide.md`](docs/interview_guide.md)**: Beginner-friendly tutorial on all 22+ ML/DL concepts used in this repo.
-- **[`docs/interview_defense.md`](docs/interview_defense.md)**: 30-second pitch, 2-minute walkthrough, 28 project Q&As, and 12 follow-up defenses.
-- **[`docs/learning_plan.md`](docs/learning_plan.md)**: Prioritized 2-day study plan for interview readiness.
+- **[`docs/methodology.md`](docs/methodology.md)** — Controlled experimental design, data split hygiene, evaluation metrics, and corruption testing.
+- **[`docs/architecture.md`](docs/architecture.md)** — CNN architecture, tensor dimensions, parameter counts, and spatial attention mechanism.
+- **[`docs/experiments.md`](docs/experiments.md)** — Experiment configurations, smoke-test results, CIFAR-10 benchmarks, and result interpretation.
+- **[`docs/limitations.md`](docs/limitations.md)** — Methodological limitations, dataset constraints, and interpretability considerations.
 
 ---
 
